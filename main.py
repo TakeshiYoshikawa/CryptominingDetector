@@ -1,7 +1,22 @@
 import re
 import scapy.all as sc
+from numpy import mean
+from psutil import cpu_percent, virtual_memory
 from collections import *
+from time import sleep, time
 
+def time_out(seconds):
+    return time() + seconds
+
+def cpu_spike(duration):
+    time_limit = time_out(duration)
+    while(time() < time_limit):
+        cpu_usage = mean(cpu_percent(percpu=True))
+
+        #30% is an alarming average value
+        if(cpu_usage > 30.00 and virtual_memory().percent > 70.00): 
+            print("CPU and Memory spikes detected")
+        sleep(3)
 
 def send_firewall_alert():
     pass
@@ -31,4 +46,6 @@ def is_stratum_protocol(filename):
     return False
 
 if __name__ == '__main__':
-    print(is_stratum_protocol('transactions.txt'))
+    duration = eval(input("How many seconds:"))
+    cpu_spike(duration)
+    # print(is_stratum_protocol('transactions.txt'))
