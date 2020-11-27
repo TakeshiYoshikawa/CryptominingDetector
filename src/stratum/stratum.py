@@ -35,7 +35,10 @@ def find_stratum(filename):
             if(pattern):
                 if(pkg[1].dst not in detected_ips):
                     detected_ips.append(pkg[1].dst)
+                    detected_ips.append(pkg[1].src)
+
                     send_alert_to_firewall(pkg[1].dst)
+                    send_alert_to_firewall(pkg[1].src)
         else:
             continue
     return print("No polls were detected.")
@@ -44,9 +47,15 @@ def send_alert_to_firewall(ip):
     print("Blocking address", ip)
     run(['iptables', '-I', 'INPUT', '1', '-s', ip, '-j', 'DROP'])  
 
+def create_pcap(filename, number_of_packets):
+    sniffer = sniff(count=number_of_packets, filter="tcp")
+    wrpcap("pkt/{0}".format(filename), sniffer)
+    return "pkt/{0}".format(filename)
+
 def start():
-    sniffer = sniff(count=1000, filter="tcp")
-    wrpcap("pkt/miner.pcap", sniffer)
-    find_stratum("pkt/miner.pcap")
-    print("Finished analyzing process.")
+    filename = "miner.pcap"
+    _pcap = create_pcap("miner.pcap", 10)
+    find_stratum(_pcap)
+
+    #print("Finished analyzing process.")
     # cpu_spike(duration)
