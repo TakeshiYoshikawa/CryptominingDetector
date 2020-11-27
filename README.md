@@ -1,7 +1,5 @@
 # CryptominingDetector
  
-# Django Back End
-
 ## Use virtualenv
 
 ### Create virtual environment
