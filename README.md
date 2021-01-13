@@ -18,3 +18,6 @@
 ### When you want to leave virtualenv
 
 * ```deactivate```
+
+## Check firewall table for blocked IPs
+* ```iptables -L INPUT -n --line-numbers```
