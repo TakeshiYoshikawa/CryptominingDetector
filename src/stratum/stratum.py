@@ -8,16 +8,17 @@ from time import sleep, time
 
 
 def time_out(seconds):
-    return time() + seconds
+    return round(time() + seconds)
 
-def cpu_spike(duration, percent_limit):
-    time_limit = time_out(duration)
-    while(time() < time_limit):
-        cpu_usage = mean(cpu_percent(percpu=True))
-
-        if(cpu_usage >= percent_limit and virtual_memory().percent > 70.00): 
-            print("CPU and Memory spikes detected")
-        sleep(3)
+def isCpuSpike(duration, cpu_usage, percent_limit):
+    limit_time = time_out(duration)
+    while(limit_time > time()):
+        # cpu_usage = mean(cpu_percent(interval=1, percpu=True))
+        if(cpu_usage >= percent_limit): 
+            print("CPU spike detected")
+            return True
+            
+    return False
 
 def find_stratum(filename):
     detected_ips = []
