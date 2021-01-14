@@ -46,10 +46,5 @@ def send_alert_to_firewall(ip):
     print("Blocking address", ip)
     run(['iptables', '-I', 'INPUT', '1', '-s', ip, '-j', 'DROP'])  
 
-def create_pcap(filename, number_of_packets):
-    sniffer = sniff(count=number_of_packets, filter="tcp")
-    wrpcap("pkt/{0}".format(filename), sniffer)
-    return "pkt/{0}".format(filename)
-
 def start():
     block()
