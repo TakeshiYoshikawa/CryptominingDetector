@@ -37,6 +37,7 @@ def block():
 
                 if(pattern):
                     if(pkg[1].dst not in detected_ips):
+                        store_miner_ip(pkg[1].dst)
                         detected_ips.append(pkg[1].dst)
                         send_alert_to_firewall(pkg[1].dst)
             else:
@@ -45,6 +46,11 @@ def block():
 def send_alert_to_firewall(ip):
     print("Blocking address", ip)
     run(['iptables', '-I', 'INPUT', '1', '-s', ip, '-j', 'DROP'])  
+
+def store_miner_ip(_ip):
+    file = open("src/blacklisted_ips.txt", "a")
+    file.write(str(_ip) + "\n")
+    file.close
 
 def start():
     block()
