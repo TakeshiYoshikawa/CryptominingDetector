@@ -149,3 +149,4 @@ cython_debug/
 
 #pcap
 pkt/test.pcap
+pkt/miner.pcap
