@@ -30,8 +30,7 @@ def block():
 
         for pkg in pkg_list:
             if(pkg[1].haslayer(Raw)): 
-                #Convert bytes payload to str
-                payload_str = linehexdump(pkg.load, onlyasc=1, dump=True) 
+                payload_str = linehexdump(pkg.load, onlyasc=1, dump=True) #Convert bytes payload to str
                 pattern = all(tags in r.findall(payload_str) for tags in stratum_tag)
                 # print(payloadStr)
 
