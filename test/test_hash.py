@@ -1,5 +1,5 @@
 import pytest
-from src.hash_finder import is_mining_block
+from src.hash_checker import is_mining_block
 
 def test_transaction_hash():
     assert(is_mining_block("44395a52d6722815be370fd739a743c8f7ec6f6f2fcd93083e220f9d2cf47e91") == False)
