@@ -1,44 +1,27 @@
 import re
 from scapy.all import *
-from subprocess import run
-from numpy import mean
-from psutil import cpu_percent, virtual_memory
 from collections import *
-from time import sleep, time
-
-
-def time_out(seconds):
-    return round(time() + seconds)
-
-def isCpuSpike(duration, cpu_usage, percent_limit):
-    limit_time = time_out(duration)
-    while(limit_time > time()):
-        # cpu_usage = mean(cpu_percent(interval=1, percpu=True))
-        if(cpu_usage >= percent_limit): 
-            print("CPU spike detected")
-            return True
-
-    return False
+from subprocess import run
 
 def block():
     detected_ips = []
     
     while(True):
-        pkg_list = sniff(timeout=1, filter="tcp")
+        packet_list = sniff(timeout=1, filter="tcp")
         stratum_tag = ['jsonrpc']
         r = re.compile(r'\bjsonrpc\b | \bjob\b | \bblob\b', flags=re.I | re.X)
 
-        for pkg in pkg_list:
-            if(pkg[1].haslayer(Raw)): 
-                payload_str = linehexdump(pkg.load, onlyasc=1, dump=True) #Convert bytes payload to str
+        for packet in packet_list:
+            if(packet[1].haslayer(Raw)): 
+                payload_str = linehexdump(packet.load, onlyasc=1, dump=True) #Convert bytes payload to str
                 pattern = all(tags in r.findall(payload_str) for tags in stratum_tag)
                 # print(payloadStr)
 
                 if(pattern):
-                    if(pkg[1].dst not in detected_ips):
-                        store_miner_ip(pkg[1].dst)
-                        detected_ips.append(pkg[1].dst)
-                        send_alert_to_firewall(pkg[1].dst)
+                    if(packet[1].dst not in detected_ips):
+                        store_miner_ip(packet[1].dst)
+                        detected_ips.append(packet[1].dst)
+                        send_alert_to_firewall(packet[1].dst)
             else:
                 continue
             
