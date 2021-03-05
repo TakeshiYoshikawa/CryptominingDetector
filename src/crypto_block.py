@@ -12,7 +12,7 @@ def block():
         packet_list = sniff(timeout=1, filter="tcp")
         stratum_headers = ['jsonrpc']
         
-        search = re.compile(r'\bjsonrpc\b | \bjob\b | \bblob\b', flags=re.I | re.X)
+        search = re.compile(r'jsonrpc | job | blob', flags=re.I | re.X)
         hash_search = re.compile(r'\b[A-Fa-f0-9]{64}\b')
 
         for packet in packet_list:
@@ -21,9 +21,11 @@ def block():
                 pattern = all(tags in search.findall(payload_str) for tags in stratum_headers) #Checks if all keywords have been encountered
                 
                 hash = hash_search.findall(payload_str)
-
+                print(search.findall(payload_str))
                 if(is_mining_block(hash) == True):
                     print("New block detected: {}".format(hash))
+                    print("Block address: {}".format(packet[1].src))
+                    send_alert_to_firewall(packet[1].src)
                 
                 '''
                 if(pattern):
