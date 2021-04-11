@@ -1,5 +1,5 @@
-python3-pytest==3.3.2
-numpy==1.19.4
-scapy==2.4.4
 wheel==0.35.1
+numpy==1.19.4
+requests==2.25.1
 psutil==5.7.3
+scapy==2.4.4
