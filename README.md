@@ -21,3 +21,13 @@
 
 ## Check firewall table for blocked IPs
 * ```iptables -L INPUT -n --line-numbers```
+
+## Run Tests
+
+### Install pytest
+
+* ```sudo apt install python3-pytest ```
+
+### Execute tests
+
+* ```pytest-3 test/```
