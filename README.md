@@ -4,7 +4,7 @@
 
 ### Create virtual environment
 
-* ```virtualenv env```
+* ```virtualenv env``` or ```python3 -m venv ./env/```
 
 ### Activate virtual environment
 
