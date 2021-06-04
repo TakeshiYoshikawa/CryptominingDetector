@@ -1,50 +1,37 @@
 import re
 from scapy.all import sniff, Raw, linehexdump
+from src.hash_checker import is_mining_block
 from collections import *
 from subprocess import run
-from src.hash_checker import is_mining_block
 
+def start():
+    block()
+
+def send_alert_to_firewall(ip):
+    print("Blocking address", ip)
+    run(['iptables', '-I', 'INPUT', '1', '-s', ip, '-j', 'DROP'])  
+
+def is_sending_a_miner_challenge(payload):
+    return payload != []
 
 def block():
     detected_ips = []
     
     while(True):
-        packet_list = sniff(timeout=1, filter="tcp")
-        stratum_headers = ['jsonrpc']
-        
-        search = re.compile(r'jsonrpc | job | blob', flags=re.I | re.X)
-        hash_search = re.compile(r'\b[A-Fa-f0-9]{64}\b')
+        packet_list = sniff(timeout=1, filter="tcp")        
+        client_packet = re.compile(r'"method":"submit"|"result":"[A-Fa-f0-9]{64}"|nonce":"[0-9a-fA-f]{8}"')
 
         for packet in packet_list:
             if(packet[1].haslayer(Raw)): 
-                payload_str = linehexdump(packet.load, onlyasc=1, dump=True) #Convert bytes payload to str
-                pattern = all(tags in search.findall(payload_str) for tags in stratum_headers) #Checks if all keywords have been encountered
+                #Convert bytes payload to string
+                payload_str = linehexdump(packet.load, onlyasc=1, dump=True) 
                 
-                hash = hash_search.findall(payload_str)
-                #print(search.findall(payload_str))
-                if(is_mining_block(hash) == True):
-                    #print("New block detected: {}".format(hash))
-                    #print("Block address: {}".format(packet[1].src))
-                    send_alert_to_firewall(packet[1].src)
+                match = is_sending_a_miner_challenge(client_packet.findall(payload_str))
                 
-                '''
-                if(pattern):
-                    if(packet[1].dst not in detected_ips):
-                        store_miner_ip(packet[1].dst)
-                        detected_ips.append(packet[1].dst)
-                        send_alert_to_firewall(packet[1].dst)
-                '''
-            else:
-                continue
-            
-def send_alert_to_firewall(ip):
-    print("Blocking address", ip)
-    run(['iptables', '-I', 'INPUT', '1', '-s', ip, '-j', 'DROP'])  
+                if(match):
+                    print(match)
+                    print("Blocking communication from {} to {}".format(packet[1].src, packet[1].dst))
 
-def store_miner_ip(_ip):
-    file = open("src/blacklisted_ips.txt", "a")
-    file.write(str(_ip) + "\n")
-    file.close
-
-def start():
-    block()
+                # if(pattern):
+                #     if(packet[1].dst not in detected_ips):
+                #         send_alert_to_firewall(packet[1].dst)
