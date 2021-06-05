@@ -151,3 +151,4 @@ cython_debug/
 pkt/test.pcap
 pkt/miner.pcap
 src/blacklisted_ips.txt
+/.vs

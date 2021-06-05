@@ -3,6 +3,7 @@ from scapy.all import sniff, Raw, linehexdump
 from src.hash_checker import is_mining_block
 from collections import *
 from subprocess import run
+from time import sleep
 
 def start():
     block()
@@ -29,9 +30,6 @@ def block():
                 match = is_sending_a_miner_challenge(client_packet.findall(payload_str))
                 
                 if(match):
-                    print(match)
-                    print("Blocking communication from {} to {}".format(packet[1].src, packet[1].dst))
-
-                # if(pattern):
-                #     if(packet[1].dst not in detected_ips):
-                #         send_alert_to_firewall(packet[1].dst)
+                    print("Blocking communication from server (IP:{})".format(packet[1].dst))
+                    #send_alert_to_firewall(packet[1].dst)
+            sleep(1)
