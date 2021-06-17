@@ -4,21 +4,15 @@ from collections import *
 from subprocess import run
 from src.hash_checker import is_mining_block
 
-
-def block():
-    detected_ips = []
-    
+def block():    
     while(True):
         packet_list = sniff(timeout=1, filter="tcp")
-        stratum_headers = ['jsonrpc']
-        
-        search = re.compile(r'jsonrpc | job | blob', flags=re.I | re.X)
         hash_search = re.compile(r'\b[A-Fa-f0-9]{64}\b')
 
         for packet in packet_list:
             if(packet[1].haslayer(Raw)): 
-                payload_str = linehexdump(packet.load, onlyasc=1, dump=True) #Convert bytes payload to str
-                pattern = all(tags in search.findall(payload_str) for tags in stratum_headers) #Checks if all keywords have been encountered
+                #Convert bytes payload to str
+                payload_str = linehexdump(packet.load, onlyasc=1, dump=True) 
                 
                 hash = hash_search.findall(payload_str)
                 if(is_mining_block(hash) == True):
@@ -31,11 +25,6 @@ def block():
 def send_alert_to_firewall(ip):
     print("Blocking address", ip)
     run(['iptables', '-I', 'INPUT', '1', '-s', ip, '-j', 'DROP'])  
-
-def store_miner_ip(_ip):
-    file = open("src/blacklisted_ips.txt", "a")
-    file.write(str(_ip) + "\n")
-    file.close
 
 def start():
     block()
