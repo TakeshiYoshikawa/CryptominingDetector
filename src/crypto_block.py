@@ -21,19 +21,10 @@ def block():
                 pattern = all(tags in search.findall(payload_str) for tags in stratum_headers) #Checks if all keywords have been encountered
                 
                 hash = hash_search.findall(payload_str)
-                #print(search.findall(payload_str))
                 if(is_mining_block(hash) == True):
-                    #print("New block detected: {}".format(hash))
-                    #print("Block address: {}".format(packet[1].src))
+                    print("New block detected: {}".format(hash))
+                    print("Block address: {}".format(packet[1].src))
                     send_alert_to_firewall(packet[1].src)
-                
-                '''
-                if(pattern):
-                    if(packet[1].dst not in detected_ips):
-                        store_miner_ip(packet[1].dst)
-                        detected_ips.append(packet[1].dst)
-                        send_alert_to_firewall(packet[1].dst)
-                '''
             else:
                 continue
             
