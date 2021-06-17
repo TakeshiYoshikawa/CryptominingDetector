@@ -7,7 +7,6 @@ from src.hash_checker import is_mining_block
 
 def block():    
     while(True):
-        sleep(1)
         packet_list = sniff(timeout=1, filter="tcp")
 
         for packet in packet_list:
